@@ -6,12 +6,14 @@
         {% csrf_token %}
         {{ form.as_p }}
         {% if messages %}
-            {% for message in messages %}
-                <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
-            {% endfor %}
+            <ul>
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
         {% endif %}
         <button type="submit" name="submit">Записать</button>
-        {% if messages %}
+        {% if overwrite %}
             <button type="submit" name="overwrite">Перезаписать</button>
         {% endif %}
     </form>
