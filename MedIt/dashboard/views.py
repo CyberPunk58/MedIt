@@ -1,16 +1,17 @@
-from django.contrib.auth.decorators import login_required, permission_required
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.db.models import Sum  # Добавлено для суммирования
-from .forms import RevenueForm
-from .models import Revenue, Clinic, PaymentType  # Добавлены модели Clinic и PaymentType
-from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
-import io
-import urllib, base64
+import plotly.express as px
+import plotly.io as pio
 from datetime import datetime, timedelta
 from django.shortcuts import render
 from .models import Revenue
+from django.db.models import Sum
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import RevenueForm
+from .models import Revenue
+from . import views
+from django.contrib.auth.decorators import permission_required
+
 
 @login_required
 def dashboard_view(request):
@@ -40,24 +41,16 @@ def dashboard_view(request):
     dates = [entry['date'] for entry in revenues_by_date]
     revenue_values = [entry['total_revenue'] for entry in revenues_by_date]
 
-    # Создание графика с помощью Matplotlib
-    plt.figure(figsize=(10, 6))
-    plt.plot(dates, revenue_values, marker='o')
-    plt.title('Revenue Over Time')
-    plt.xlabel('Date')
-    plt.ylabel('Revenue')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
+    # Создание интерактивного графика с помощью Plotly
+    fig = px.line(x=dates, y=revenue_values, labels={'x': 'Date', 'y': 'Revenue'},
+                  title='Revenue Over Time', markers=True)
 
-    # Сохранение графика в буфер памяти
-    buf = io.BytesIO()
-    plt.savefig(buf, format='png')
-    buf.seek(0)
-    string = base64.b64encode(buf.read())
-    uri = urllib.parse.quote(string)
+    fig.update_traces(mode='lines+markers', hoverinfo='text+name', marker=dict(size=8))
+
+    graph_html = pio.to_html(fig, full_html=False)
 
     context = {
-        'data': uri,
+        'graph_html': graph_html,
         'clinic_filter': clinic_filter,
         'payment_type_filter': payment_type_filter,
         'start_date': start_date,

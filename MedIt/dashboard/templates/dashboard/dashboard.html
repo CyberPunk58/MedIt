@@ -35,7 +35,9 @@
         <button type="submit">Apply Filters</button>
     </form>
 
-    <!-- Отображение графика -->
-    <img src="data:image/png;base64,{{ data }}" alt="Revenue Chart">
+    <!-- Отображение интерактивного графика -->
+    <div>
+        {{ graph_html|safe }}
+    </div>
 
 {% endblock %}
