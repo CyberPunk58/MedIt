@@ -5,6 +5,12 @@ from django.db.models import Sum  # Добавлено для суммирова
 from .forms import RevenueForm
 from .models import Revenue, Clinic, PaymentType  # Добавлены модели Clinic и PaymentType
 from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import io
+import urllib, base64
+from datetime import datetime, timedelta
+from django.shortcuts import render
+from .models import Revenue
 
 @login_required
 def dashboard_view(request):
@@ -31,22 +37,31 @@ def dashboard_view(request):
     revenues_by_date = revenues.values('date').annotate(total_revenue=Sum('revenue')).order_by('date')
 
     # Подготовка данных для графика
-    dates = [entry['date'].strftime('%Y-%m-%d') for entry in revenues_by_date]
+    dates = [entry['date'] for entry in revenues_by_date]
     revenue_values = [entry['total_revenue'] for entry in revenues_by_date]
 
-    # Получаем все клиники и типы платежей для фильтров
-    clinics = Clinic.objects.all()
-    payment_types = PaymentType.objects.all()
+    # Создание графика с помощью Matplotlib
+    plt.figure(figsize=(10, 6))
+    plt.plot(dates, revenue_values, marker='o')
+    plt.title('Revenue Over Time')
+    plt.xlabel('Date')
+    plt.ylabel('Revenue')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    # Сохранение графика в буфер памяти
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    string = base64.b64encode(buf.read())
+    uri = urllib.parse.quote(string)
 
     context = {
-        'dates': dates,
-        'revenue_values': revenue_values,
+        'data': uri,
         'clinic_filter': clinic_filter,
         'payment_type_filter': payment_type_filter,
         'start_date': start_date,
         'end_date': end_date,
-        'clinics': clinics,  # Добавлено для списка клиник в фильтре
-        'payment_types': payment_types,  # Добавлено для списка типов платежей в фильтре
     }
 
     return render(request, 'dashboard/dashboard.html', context)

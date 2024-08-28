@@ -35,31 +35,7 @@
         <button type="submit">Apply Filters</button>
     </form>
 
-    <!-- График -->
-    <canvas id="revenueChart" width="400" height="200"></canvas>
+    <!-- Отображение графика -->
+    <img src="data:image/png;base64,{{ data }}" alt="Revenue Chart">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        var ctx = document.getElementById('revenueChart').getContext('2d');
-        var revenueChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ dates|safe }},  // Даты
-                datasets: [{
-                    label: 'Revenue',
-                    data: {{ revenue_values|safe }},  // Значения дохода
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    </script>
 {% endblock %}
