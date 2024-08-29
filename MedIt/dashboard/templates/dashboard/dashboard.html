@@ -1,6 +1,43 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
+
 {% block content %}
     <h2>Welcome to the Dashboard!</h2>
-    <p>Here is some data...</p>
+
+    <!-- Форма фильтров -->
+    <form method="get" action="">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+
+        <label for="clinic">Clinic:</label>
+        <select id="clinic" name="clinic">
+            <option value="">All Clinics</option>
+            {% for clinic in clinics %}
+                <option value="{{ clinic.id }}" {% if clinic.id == clinic_filter %}selected{% endif %}>
+                    {{ clinic.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="payment_type">Payment Type:</label>
+        <select id="payment_type" name="payment_type">
+            <option value="">All Payment Types</option>
+            {% for payment_type in payment_types %}
+                <option value="{{ payment_type.id }}" {% if payment_type.id == payment_type_filter %}selected{% endif %}>
+                    {{ payment_type.type }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Apply Filters</button>
+    </form>
+
+    <!-- Отображение интерактивного графика -->
+    <div>
+        {{ graph_html|safe }}
+    </div>
+
 {% endblock %}
