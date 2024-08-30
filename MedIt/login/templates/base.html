@@ -9,6 +9,7 @@
         <nav>
             <a href="{% url 'home' %}">Home</a> |
             <a href="{% url 'dashboard' %}">Dashboard</a> |
+            <a href="{% url 'knowledge_base' %}">База знаний</a> |
             {% if perms.dashboard.add_data %}
                 <a href="{% url 'dashboard_admin' %}">Dashboard Admin</a> |
             {% endif %}
