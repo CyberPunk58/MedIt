@@ -42,8 +42,8 @@ def dashboard_view(request):
     revenue_values = [entry['total_revenue'] for entry in revenues_by_date]
 
     # Создание интерактивного графика с помощью Plotly
-    fig = px.line(x=dates, y=revenue_values, labels={'x': 'Date', 'y': 'Revenue'},
-                  title='Revenue Over Time', markers=True)
+    fig = px.line(x=dates, y=revenue_values, labels={'x': 'Дата', 'y': 'Выручка'},
+                  title='Выручка за период', markers=True)
 
     fig.update_traces(mode='lines+markers', hoverinfo='text+name', marker=dict(size=8))
 
