@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}База знаний{% endblock %}
+
+{% block content %}
+    <h2>База знаний</h2>
+    <a href="{% url 'add_section' %}">Добавить раздел</a> |
+    <a href="{% url 'add_article' %}">Добавить статью</a>
+
+    {% for section in sections %}
+        <h3>{{ section.title }}</h3>
+        <p>{{ section.description }}</p>
+        <ul>
+            {% for article in section.articles.all %}
+                <li>{{ article.title }}</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock %}

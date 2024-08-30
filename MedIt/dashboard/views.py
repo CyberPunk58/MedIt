@@ -1,23 +1,22 @@
 import plotly.express as px
 import plotly.io as pio
 from datetime import datetime, timedelta
-from django.shortcuts import render
-from .models import Revenue
 from django.db.models import Sum
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import RevenueForm
 from .models import Revenue
-from . import views
 from django.contrib.auth.decorators import permission_required
+from .models import KnowledgeBaseSection, KnowledgeBaseArticle
+from .forms import KnowledgeBaseSectionForm, KnowledgeBaseArticleForm
 
 
 @login_required
 def dashboard_view(request):
     # Получаем текущую дату и дату полугодия назад
     end_date = datetime.today()
-    start_date = end_date - timedelta(days=182)
+    start_date = end_date - timedelta(days=365)
 
     # Получаем параметры фильтров из GET-запроса
     clinic_filter = request.GET.get('clinic')
@@ -92,3 +91,27 @@ def dashboard_admin_view(request):
         form = RevenueForm()
 
     return render(request, 'dashboard/dashboard_admin.html', {'form': form, 'overwrite': overwrite})
+
+def knowledge_base_view(request):
+    sections = KnowledgeBaseSection.objects.all()
+    return render(request, 'knowledge_base/knowledge_base.html', {'sections': sections})
+
+def add_section_view(request):
+    if request.method == 'POST':
+        form = KnowledgeBaseSectionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('knowledge_base')
+    else:
+        form = KnowledgeBaseSectionForm()
+    return render(request, 'knowledge_base/add_section.html', {'form': form})
+
+def add_article_view(request):
+    if request.method == 'POST':
+        form = KnowledgeBaseArticleForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('knowledge_base')
+    else:
+        form = KnowledgeBaseArticleForm()
+    return render(request, 'knowledge_base/add_article.html', {'form': form})

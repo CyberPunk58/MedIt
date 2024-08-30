@@ -1,5 +1,6 @@
 from django import forms
 from .models import Clinic, Revenue, PaymentType
+from .models import KnowledgeBaseSection, KnowledgeBaseArticle
 
 class MonthYearWidget(forms.DateInput):
     input_type = 'month'
@@ -17,3 +18,12 @@ class RevenueForm(forms.ModelForm):
         model = Revenue
         fields = ['clinic', 'revenue', 'date', 'payment_type']
 
+class KnowledgeBaseSectionForm(forms.ModelForm):
+    class Meta:
+        model = KnowledgeBaseSection
+        fields = ['title', 'description']
+
+class KnowledgeBaseArticleForm(forms.ModelForm):
+    class Meta:
+        model = KnowledgeBaseArticle
+        fields = ['section', 'title', 'content']
