@@ -11,7 +11,7 @@
         <p>{{ section.description }}</p>
         <ul>
             {% for article in section.articles.all %}
-                <li>{{ article.title }}</li>
+                <li><a href="{% url 'view_article' article.id %}">{{ article.title }}</a></li>
             {% endfor %}
         </ul>
     {% endfor %}

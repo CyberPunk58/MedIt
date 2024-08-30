@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+    <h2>{{ article.title }}</h2>
+    <p>{{ article.content }}</p>
+
+    {% if user.is_authenticated  %}
+        <a href="{% url 'edit_article' article.id %}">Редактировать</a>
+    {% endif %}
+
+    {% if article.attached_image %}
+        <img src="{{ article.attached_image.url }}" alt="{{ article.title }}">
+    {% endif %}
+
+    {% if article.attached_file %}
+        <a href="{{ article.attached_file.url }}">Скачать файл</a>
+    {% endif %}
+
+    <a href="{% url 'knowledge_base' %}">Назад к базе знаний</a>
+{% endblock %}

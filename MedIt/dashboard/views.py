@@ -10,6 +10,7 @@ from .models import Revenue
 from django.contrib.auth.decorators import permission_required
 from .models import KnowledgeBaseSection, KnowledgeBaseArticle
 from .forms import KnowledgeBaseSectionForm, KnowledgeBaseArticleForm
+from django.shortcuts import get_object_or_404
 
 
 @login_required
@@ -106,12 +107,30 @@ def add_section_view(request):
         form = KnowledgeBaseSectionForm()
     return render(request, 'knowledge_base/add_section.html', {'form': form})
 
+from django.shortcuts import render, redirect
+from .forms import KnowledgeBaseArticleForm
+
 def add_article_view(request):
     if request.method == 'POST':
-        form = KnowledgeBaseArticleForm(request.POST)
+        form = KnowledgeBaseArticleForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('knowledge_base')
     else:
         form = KnowledgeBaseArticleForm()
     return render(request, 'knowledge_base/add_article.html', {'form': form})
+
+def view_article(request, id):
+    article = get_object_or_404(KnowledgeBaseArticle, id=id)
+    return render(request, 'knowledge_base/view_article.html', {'article': article})
+
+def edit_article_view(request, id):
+    article = get_object_or_404(KnowledgeBaseArticle, id=id)
+    if request.method == 'POST':
+        form = KnowledgeBaseArticleForm(request.POST, request.FILES, instance=article)
+        if form.is_valid():
+            form.save()
+            return redirect('view_article', id=article.id)
+    else:
+        form = KnowledgeBaseArticleForm(instance=article)
+    return render(request, 'knowledge_base/edit_article.html', {'form': form, 'article': article})
