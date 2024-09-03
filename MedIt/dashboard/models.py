@@ -35,8 +35,8 @@ class KnowledgeBaseSection(models.Model):
 
 class KnowledgeBaseArticle(models.Model):
     title = models.CharField(max_length=200)
-    content = RichTextField()
-    section = models.ForeignKey(KnowledgeBaseSection, on_delete=models.CASCADE, related_name='articles')
+    content = RichTextField()  # Поле с поддержкой форматирования текста
+    section = models.ForeignKey(KnowledgeBaseSection, related_name='articles', on_delete=models.CASCADE)
     attached_file = models.FileField(upload_to='knowledge_base/files/', blank=True, null=True)
     attached_image = models.ImageField(upload_to='knowledge_base/images/', blank=True, null=True)
 
