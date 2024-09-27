@@ -31,51 +31,54 @@ def dashboard_view(request):
     end_date = datetime.today()
     start_date = end_date - timedelta(days=182)
 
-    # Получаем параметры фильтров из GET-запроса (или используем значения по умолчанию)
-    clinic_filter = request.GET.get('clinic', '')
-    payment_type_filter = request.GET.get('payment_type', '')
+    # Получаем параметры фильтров
+    clinic_filter = request.GET.getlist('clinic')  # список клиник
+    payment_type_filter = request.GET.getlist('payment_type')  # список видов оплаты
     start_date = request.GET.get('start_date', start_date.strftime('%Y-%m-%d'))
     end_date = request.GET.get('end_date', end_date.strftime('%Y-%m-%d'))
 
-    # Преобразуем даты в нужный формат
+    # Преобразование дат
     start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
     end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
 
-    # Фильтрация данных
+    # Фильтрация
     revenues = Revenue.objects.filter(date__range=[start_date_obj, end_date_obj])
 
-    # Применяем фильтр по клинике, если выбран
     if clinic_filter:
-        revenues = revenues.filter(clinic__id=clinic_filter)
+        revenues = revenues.filter(clinic__id__in=clinic_filter)
 
-    # Применяем фильтр по виду оплаты, если выбран
     if payment_type_filter:
-        revenues = revenues.filter(payment_type__id=payment_type_filter)
+        revenues = revenues.filter(payment_type__id__in=payment_type_filter)
 
-    # Группировка данных по дате и суммирование доходов
+    # Группировка и суммирование доходов по датам
     revenues_by_date = revenues.values('date').annotate(total_revenue=Sum('revenue')).order_by('date')
 
-    # Подготовка данных для графика
+    # Даты и значения доходов
     dates = [entry['date'].strftime('%Y-%m-%d') for entry in revenues_by_date]
     revenue_values = [entry['total_revenue'] for entry in revenues_by_date]
 
-    # Генерация графика
-    graph_html = generate_graph_html(dates, revenue_values)
+    # Построение графика
+    if dates and revenue_values:
+        fig = px.line(x=dates, y=revenue_values, title="Доходы по датам")
+        fig.update_layout(xaxis_title="Дата", yaxis_title="Доход")
+        graph_html = pio.to_html(fig, full_html=False)
+    else:
+        graph_html = "<p>Нет данных для отображения графика</p>"
 
-    # Получение всех клиник и типов оплат для фильтров
+    # Все клиники и виды оплат для фильтров
     clinics = Clinic.objects.all()
     payment_types = PaymentType.objects.all()
 
     context = {
         'dates': dates,
         'revenue_values': revenue_values,
-        'clinic_filter': clinic_filter,  # Передаем выбранный фильтр
-        'payment_type_filter': payment_type_filter,  # Передаем выбранный фильтр
-        'start_date': start_date,  # Передаем выбранную начальную дату
-        'end_date': end_date,  # Передаем выбранную конечную дату
-        'clinics': clinics,  # Передаем список клиник в шаблон
-        'payment_types': payment_types,  # Передаем список типов оплат
-        'graph_html': graph_html  # Передаем HTML графика в шаблон
+        'clinic_filter': clinic_filter,
+        'payment_type_filter': payment_type_filter,
+        'start_date': start_date,
+        'end_date': end_date,
+        'clinics': clinics,
+        'payment_types': payment_types,
+        'graph_html': graph_html,  # Передаем HTML графика
     }
 
     return render(request, 'dashboard/dashboard.html', context)
