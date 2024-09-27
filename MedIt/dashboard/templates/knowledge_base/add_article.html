@@ -1,14 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Создать / Редактировать статью{% endblock %}
+{% block title %}Добавить статью{% endblock %}
 
 {% block content %}
-    <h2>{{ title }}</h2>
-
-    <form method="post" enctype="multipart/form-data">
+    <h2>Добавить статью</h2>
+    <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Сохранить</button>
     </form>
-
-    <a href="{% url 'knowledge_base' %}">Назад</a>
 {% endblock %}

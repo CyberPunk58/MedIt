@@ -7,54 +7,75 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .forms import RevenueForm
 from .models import Revenue
+from .models import Clinic, PaymentType
 from django.contrib.auth.decorators import permission_required
 from .models import KnowledgeBaseSection, KnowledgeBaseArticle
 from .forms import KnowledgeBaseSectionForm, KnowledgeBaseArticleForm
 from django.shortcuts import get_object_or_404
 
 
+import plotly.express as px
+import plotly.io as pio
+
+def generate_graph_html(dates, revenue_values):
+    # Создаем график с помощью Plotly
+    fig = px.line(x=dates, y=revenue_values, labels={'x': 'Дата', 'y': 'Доход'}, title='Доход по дням')
+
+    # Возвращаем HTML код графика
+    graph_html = pio.to_html(fig, full_html=False)
+    return graph_html
+
 @login_required
 def dashboard_view(request):
-    # Получаем текущую дату и дату полугодия назад
+    # Устанавливаем текущую дату и дату за полгода назад по умолчанию
     end_date = datetime.today()
-    start_date = end_date - timedelta(days=365)
+    start_date = end_date - timedelta(days=182)
 
-    # Получаем параметры фильтров из GET-запроса
-    clinic_filter = request.GET.get('clinic')
-    payment_type_filter = request.GET.get('payment_type')
+    # Получаем параметры фильтров из GET-запроса (или используем значения по умолчанию)
+    clinic_filter = request.GET.get('clinic', '')
+    payment_type_filter = request.GET.get('payment_type', '')
     start_date = request.GET.get('start_date', start_date.strftime('%Y-%m-%d'))
     end_date = request.GET.get('end_date', end_date.strftime('%Y-%m-%d'))
 
-    # Фильтрация данных
-    revenues = Revenue.objects.filter(date__range=[start_date, end_date])
+    # Преобразуем даты в нужный формат
+    start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date_obj = datetime.strptime(end_date, '%Y-%m-%d')
 
+    # Фильтрация данных
+    revenues = Revenue.objects.filter(date__range=[start_date_obj, end_date_obj])
+
+    # Применяем фильтр по клинике, если выбран
     if clinic_filter:
         revenues = revenues.filter(clinic__id=clinic_filter)
 
+    # Применяем фильтр по виду оплаты, если выбран
     if payment_type_filter:
         revenues = revenues.filter(payment_type__id=payment_type_filter)
 
-    # Группировка данных по дате и суммирование revenue
+    # Группировка данных по дате и суммирование доходов
     revenues_by_date = revenues.values('date').annotate(total_revenue=Sum('revenue')).order_by('date')
 
     # Подготовка данных для графика
-    dates = [entry['date'] for entry in revenues_by_date]
+    dates = [entry['date'].strftime('%Y-%m-%d') for entry in revenues_by_date]
     revenue_values = [entry['total_revenue'] for entry in revenues_by_date]
 
-    # Создание интерактивного графика с помощью Plotly
-    fig = px.line(x=dates, y=revenue_values, labels={'x': 'Дата', 'y': 'Выручка'},
-                  title='Выручка за период', markers=True)
+    # Генерация графика
+    graph_html = generate_graph_html(dates, revenue_values)
 
-    fig.update_traces(mode='lines+markers', hoverinfo='text+name', marker=dict(size=8))
-
-    graph_html = pio.to_html(fig, full_html=False)
+    # Получение всех клиник и типов оплат для фильтров
+    clinics = Clinic.objects.all()
+    payment_types = PaymentType.objects.all()
 
     context = {
-        'graph_html': graph_html,
-        'clinic_filter': clinic_filter,
-        'payment_type_filter': payment_type_filter,
-        'start_date': start_date,
-        'end_date': end_date,
+        'dates': dates,
+        'revenue_values': revenue_values,
+        'clinic_filter': clinic_filter,  # Передаем выбранный фильтр
+        'payment_type_filter': payment_type_filter,  # Передаем выбранный фильтр
+        'start_date': start_date,  # Передаем выбранную начальную дату
+        'end_date': end_date,  # Передаем выбранную конечную дату
+        'clinics': clinics,  # Передаем список клиник в шаблон
+        'payment_types': payment_types,  # Передаем список типов оплат
+        'graph_html': graph_html  # Передаем HTML графика в шаблон
     }
 
     return render(request, 'dashboard/dashboard.html', context)
@@ -134,3 +155,10 @@ def edit_article_view(request, id):
     else:
         form = KnowledgeBaseArticleForm(instance=article)
     return render(request, 'knowledge_base/edit_article.html', {'form': form, 'article': article})
+
+def stationary_view(request):
+    return render(request, 'stationary/stationary.html')
+
+@permission_required('dashboard.add_stationary_data', raise_exception=True)
+def stationary_admin_view(request):
+    return render(request, 'stationary/stationary_admin.html')

@@ -13,6 +13,10 @@
             {% if perms.dashboard.add_data %}
                 <a href="{% url 'dashboard_admin' %}">Dashboard Admin</a> |
             {% endif %}
+            <a href="{% url 'stationary' %}">Стационар</a> |
+            {% if perms.stationary.change_stationary %}
+                <a href="{% url 'stationary_admin' %}">Администрирование стационара</a> |
+            {% endif %}
             <form method="post" action="{% url 'logout' %}" style="display:inline;">
                 {% csrf_token %}
                 <button type="submit">Logout</button>

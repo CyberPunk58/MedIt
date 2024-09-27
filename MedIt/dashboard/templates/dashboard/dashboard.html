@@ -14,9 +14,9 @@
 
         <label for="clinic">Клиника:</label>
         <select id="clinic" name="clinic">
-            <option value="">All Clinics</option>
+            <option value="">Все клиники</option>
             {% for clinic in clinics %}
-                <option value="{{ clinic.id }}" {% if clinic.id == clinic_filter %}selected{% endif %}>
+                <option value="{{ clinic.id }}" {% if clinic.id|stringformat:"s" == clinic_filter %}selected{% endif %}>
                     {{ clinic.name }}
                 </option>
             {% endfor %}
@@ -24,9 +24,9 @@
 
         <label for="payment_type">Вид оплаты:</label>
         <select id="payment_type" name="payment_type">
-            <option value="">All Payment Types</option>
+            <option value="">Все виды оплат</option>
             {% for payment_type in payment_types %}
-                <option value="{{ payment_type.id }}" {% if payment_type.id == payment_type_filter %}selected{% endif %}>
+                <option value="{{ payment_type.id }}" {% if payment_type.id|stringformat:"s" == payment_type_filter %}selected{% endif %}>
                     {{ payment_type.type }}
                 </option>
             {% endfor %}
