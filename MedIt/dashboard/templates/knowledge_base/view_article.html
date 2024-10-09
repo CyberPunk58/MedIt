@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="article-container">
+    <h2 class="article-title">{{ article.title }}</h2>
+
+    <div class="article-content">
+        {{ article.content|safe }}
+    </div>
+
+    {% if article.attached_image %}
+    <div class="article-image">
+        <img src="{{ article.attached_image.url }}" alt="{{ article.title }}" class="img-fluid rounded shadow">
+    </div>
+    {% endif %}
+
+    {% if article.attached_file %}
+    <div class="download-section">
+        <a href="{{ article.attached_file.url }}" class="btn btn-primary">
+            <i class="fa fa-download"></i> Скачать файл
+        </a>
+    </div>
+    {% endif %}
+
+    {% if user.is_authenticated %}
+    <div class="edit-link">
+        <a href="{% url 'edit_article' article.id %}" class="btn btn-secondary">
+            <i class="fa fa-edit"></i> Редактировать
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="back-link">
+        <a href="{% url 'knowledge_base' %}" class="btn btn-light">
+            <i class="fa fa-arrow-left"></i> Назад к базе знаний
+        </a>
+    </div>
+</div>
+{% endblock %}

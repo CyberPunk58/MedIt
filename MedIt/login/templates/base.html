@@ -1,8 +1,14 @@
+
 <!DOCTYPE html>
 <html>
 <head>
+
     <title>{% block title %}My Site{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'your_app/css/styles.css' %}">
+
 </head>
+
 <body>
     {% if user.is_authenticated %}
         <p>Привет, {{ user.username }}!</p>
@@ -12,6 +18,10 @@
             <a href="{% url 'knowledge_base' %}">База знаний</a> |
             {% if perms.dashboard.add_data %}
                 <a href="{% url 'dashboard_admin' %}">Dashboard Admin</a> |
+            {% endif %}
+            <a href="{% url 'stationary' %}">Стационар</a> |
+            {% if perms.stationary.change_stationary %}
+                <a href="{% url 'stationary_admin' %}">Администрирование стационара</a> |
             {% endif %}
             <form method="post" action="{% url 'logout' %}" style="display:inline;">
                 {% csrf_token %}

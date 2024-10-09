@@ -26,4 +26,4 @@ class KnowledgeBaseSectionForm(forms.ModelForm):
 class KnowledgeBaseArticleForm(forms.ModelForm):
     class Meta:
         model = KnowledgeBaseArticle
-        fields = ['section', 'title', 'content']
+        fields = ['title', 'content', 'section', 'attached_file', 'attached_image']

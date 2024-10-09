@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from ckeditor.fields import RichTextField
 
 class Clinic(models.Model):
     name = models.CharField(max_length=255)
@@ -27,16 +28,17 @@ class Revenue(models.Model):
 
 
 class KnowledgeBaseSection(models.Model):
-    title = models.CharField(max_length=200, verbose_name=_("Title"))
-    description = models.TextField(blank=True, null=True, verbose_name=_("Description"))
-
+    title = models.CharField(max_length=200)
+    description = models.TextField()
     def __str__(self):
         return self.title
 
 class KnowledgeBaseArticle(models.Model):
-    section = models.ForeignKey(KnowledgeBaseSection, on_delete=models.CASCADE, related_name='articles', verbose_name=_("Section"))
-    title = models.CharField(max_length=200, verbose_name=_("Title"))
-    content = models.TextField(verbose_name=_("Content"))
+    title = models.CharField(max_length=200)
+    content = RichTextField()
+    section = models.ForeignKey(KnowledgeBaseSection, on_delete=models.CASCADE, related_name='articles')
+    attached_file = models.FileField(upload_to='knowledge_base/files/', blank=True, null=True)
+    attached_image = models.ImageField(upload_to='knowledge_base/images/', blank=True, null=True)
 
     def __str__(self):
         return self.title

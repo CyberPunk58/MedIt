@@ -1,0 +1,68 @@
+.article-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.article-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.article-content {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.article-image {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.article-image img {
+    max-width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.download-section, .edit-link, .back-link {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.download-section a, .edit-link a, .back-link a {
+    text-decoration: none;
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.download-section a {
+    background-color: #007bff;
+    color: white;
+}
+
+.edit-link a {
+    background-color: #6c757d;
+    color: white;
+}
+
+.back-link a {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.download-section a:hover, .edit-link a:hover, .back-link a:hover {
+    background-color: #0056b3;
+    color: white;
+}
+
+.fa {
+    margin-right: 5px;
+}
